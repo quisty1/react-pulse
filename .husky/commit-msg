@@ -1,0 +1,2 @@
+# Проверяем сообщение коммита через commitlint
+pnpm exec commitlint --edit "$1"

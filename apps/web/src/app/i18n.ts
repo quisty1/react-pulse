@@ -1,0 +1,126 @@
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+const resources = {
+  en: {
+    translation: {
+      app: {
+        name: 'Pulse',
+        tagline: 'Team chat with a calm, focused pulse',
+        skipToContent: 'Skip to content',
+      },
+      auth: {
+        email: 'Email',
+        password: 'Password',
+        displayName: 'Display name',
+        signIn: 'Sign in',
+        signingIn: 'Signing in…',
+        signUp: 'Sign up',
+        createAccount: 'Create account',
+        creating: 'Creating…',
+        fillDemo: 'Fill demo credentials',
+        noAccount: 'No account?',
+        hasAccount: 'Already have an account?',
+        welcomeBack: 'Welcome back',
+        joinPulse: 'Join Pulse',
+      },
+      nav: {
+        channels: 'Channels',
+        directMessages: 'Direct messages',
+        search: 'Search',
+        settings: 'Settings',
+        logout: 'Log out',
+        createChannel: 'Create channel',
+        createWorkspace: 'Create workspace',
+        notifications: 'Notifications',
+        mentions: 'Mentions',
+      },
+      chat: {
+        messagePlaceholder: 'Message {{name}}',
+        emptyTitle: 'No messages yet',
+        emptyDescription: 'Start the conversation with a thoughtful first message.',
+        thread: 'Thread',
+        reply: 'Reply',
+        copyLink: 'Copy link',
+        edit: 'Edit',
+        delete: 'Delete',
+        jumpUnread: 'Jump to unread',
+        typing: 'typing…',
+      },
+      common: {
+        loading: 'Loading…',
+        save: 'Save',
+        cancel: 'Cancel',
+        confirm: 'Confirm',
+        create: 'Create',
+        theme: 'Theme',
+        language: 'Language',
+      },
+    },
+  },
+  ru: {
+    translation: {
+      app: {
+        name: 'Pulse',
+        tagline: 'Командный чат с спокойным и точным ритмом',
+        skipToContent: 'Перейти к содержимому',
+      },
+      auth: {
+        email: 'Email',
+        password: 'Пароль',
+        displayName: 'Имя',
+        signIn: 'Войти',
+        signingIn: 'Входим…',
+        signUp: 'Регистрация',
+        createAccount: 'Создать аккаунт',
+        creating: 'Создаём…',
+        fillDemo: 'Подставить demo-данные',
+        noAccount: 'Нет аккаунта?',
+        hasAccount: 'Уже есть аккаунт?',
+        welcomeBack: 'С возвращением',
+        joinPulse: 'Присоединиться к Pulse',
+      },
+      nav: {
+        channels: 'Каналы',
+        directMessages: 'Личные сообщения',
+        search: 'Поиск',
+        settings: 'Настройки',
+        logout: 'Выйти',
+        createChannel: 'Создать канал',
+        createWorkspace: 'Создать workspace',
+        notifications: 'Уведомления',
+        mentions: 'Упоминания',
+      },
+      chat: {
+        messagePlaceholder: 'Сообщение в {{name}}',
+        emptyTitle: 'Пока нет сообщений',
+        emptyDescription: 'Начните разговор с первого сообщения.',
+        thread: 'Тред',
+        reply: 'Ответить',
+        copyLink: 'Копировать ссылку',
+        edit: 'Редактировать',
+        delete: 'Удалить',
+        jumpUnread: 'К непрочитанным',
+        typing: 'печатает…',
+      },
+      common: {
+        loading: 'Загрузка…',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        confirm: 'Подтвердить',
+        create: 'Создать',
+        theme: 'Тема',
+        language: 'Язык',
+      },
+    },
+  },
+};
+
+void i18n.use(initReactI18next).init({
+  resources,
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: { escapeValue: false },
+});
+
+export { i18n };

@@ -1,0 +1,22 @@
+# Только PostgreSQL для локальной разработки API/web вне Docker
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pulse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pulse}
+      POSTGRES_DB: ${POSTGRES_DB:-pulse}
+    ports:
+      - '5432:5432'
+    volumes:
+      # Отдельный volume, чтобы не пересекаться с полным compose
+      - pulse_pg_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-pulse} -d ${POSTGRES_DB:-pulse}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pulse_pg_dev:

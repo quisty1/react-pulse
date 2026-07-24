@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+pnpm-lock.yaml
+storybook-static
+playwright-report
+test-results
+uploads
+*.md

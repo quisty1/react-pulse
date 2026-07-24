@@ -1,0 +1,27 @@
+# Шаблон деплоя — по умолчанию не включён в автоматический pipeline
+# Настрой secrets репозитория и запускай вручную через workflow_dispatch
+name: Deploy (template)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # На сервере: pull + пересборка compose
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            cd ${{ secrets.DEPLOY_PATH }}
+            git pull
+            docker compose pull || true
+            docker compose up -d --build
+            docker compose ps

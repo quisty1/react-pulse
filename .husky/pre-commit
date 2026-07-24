@@ -1,0 +1,2 @@
+# Перед коммитом прогоняем lint-staged (eslint/prettier по staged-файлам)
+pnpm exec lint-staged

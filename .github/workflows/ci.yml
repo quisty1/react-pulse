@@ -1,0 +1,91 @@
+# Линт, typecheck, тесты, сборка и smoke e2e на PR/push
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+# Отменяем устаревшие прогоны на той же ветке
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    # Postgres для unit/integration тестов API
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pulse
+          POSTGRES_PASSWORD: pulse
+          POSTGRES_DB: pulse
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pulse -d pulse"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://pulse:pulse@localhost:5432/pulse?schema=public
+      JWT_ACCESS_SECRET: ci-access-secret-min-32-characters!!
+      JWT_REFRESH_SECRET: ci-refresh-secret-min-32-characters!
+      CORS_ORIGIN: http://localhost:5173
+      COOKIE_SECURE: 'false'
+      VITE_API_URL: http://localhost:3001
+      VITE_SOCKET_URL: http://localhost:3001
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        run: pnpm --filter @pulse/api db:generate
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @pulse/web exec playwright install --with-deps chromium
+
+      # preview поднимается из конфига Playwright (webServer)
+      - name: Playwright
+        run: pnpm --filter @pulse/web exec playwright test --project=chromium
+        env:
+          CI: 'true'
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+
+      # Не блокируем CI, если Dockerfile ещё не готов
+      - name: Docker build api
+        if: ${{ hashFiles('apps/api/Dockerfile') != '' }}
+        continue-on-error: true
+        run: docker build -f apps/api/Dockerfile -t pulse-api:ci .
+
+      - name: Docker build web
+        if: ${{ hashFiles('apps/web/Dockerfile') != '' }}
+        continue-on-error: true
+        run: docker build -f apps/web/Dockerfile -t pulse-web:ci .

@@ -1,0 +1,274 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ChannelType {
+  PUBLIC
+  PRIVATE
+}
+
+enum ConversationType {
+  DIRECT
+  GROUP
+}
+
+enum NotificationType {
+  MENTION
+  REPLY
+  REACTION
+  INVITE
+  CHANNEL_MESSAGE
+  DM
+}
+
+// --- Auth / identity ---
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  displayName   String
+  avatarUrl     String?
+  statusMessage String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  refreshTokens        RefreshToken[]
+  workspaceMemberships WorkspaceMember[]
+  channelsCreated      Channel[]           @relation("ChannelCreator")
+  channelMemberships   ChannelMember[]
+  conversationsCreated Conversation[]      @relation("ConversationCreator")
+  conversationMembers  ConversationMember[]
+  messages             Message[]
+  reactions            Reaction[]
+  attachments          Attachment[]
+  notifications        Notification[]
+  invitesCreated       Invite[]            @relation("InviteCreator")
+}
+
+// Хеш refresh-токена; при удалении пользователя каскадно чистим
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// --- Workspace ---
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members       WorkspaceMember[]
+  channels      Channel[]
+  conversations Conversation[]
+  invites       Invite[]
+  notifications Notification[]
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(MEMBER)
+  joinedAt    DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+// Приглашение по токену (опционально с email)
+model Invite {
+  id          String        @id @default(cuid())
+  workspaceId String
+  token       String        @unique @default(cuid())
+  email       String?
+  role        WorkspaceRole @default(MEMBER)
+  createdById String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User      @relation("InviteCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+}
+
+// --- Channels ---
+
+model Channel {
+  id          String      @id @default(cuid())
+  workspaceId String
+  name        String
+  type        ChannelType @default(PUBLIC)
+  topic       String?
+  description String?
+  createdById String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  workspace Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User            @relation("ChannelCreator", fields: [createdById], references: [id])
+  members   ChannelMember[]
+  messages  Message[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+}
+
+model ChannelMember {
+  id                String    @id @default(cuid())
+  channelId         String
+  userId            String
+  lastReadMessageId String?
+  joinedAt          DateTime  @default(now())
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@index([userId])
+}
+
+// --- Direct / group conversations ---
+
+model Conversation {
+  id            String           @id @default(cuid())
+  workspaceId   String
+  type          ConversationType
+  name          String?
+  createdById   String
+  lastMessageAt DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  workspace Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User                 @relation("ConversationCreator", fields: [createdById], references: [id])
+  members   ConversationMember[]
+  messages  Message[]
+
+  @@index([workspaceId, lastMessageAt])
+}
+
+model ConversationMember {
+  id                String    @id @default(cuid())
+  conversationId    String
+  userId            String
+  lastReadMessageId String?
+  joinedAt          DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+// --- Messages ---
+
+// Сообщение в канале или DM; parentId — тред
+model Message {
+  id             String    @id @default(cuid())
+  channelId      String?
+  conversationId String?
+  parentId       String?
+  authorId       String
+  body           String
+  // Идемпотентность отправки с клиента
+  clientId       String?
+  mentionedIds   String[]  @default([])
+  editedAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  channel      Channel?      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  parent       Message?      @relation("MessageThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies      Message[]     @relation("MessageThread")
+  author       User          @relation(fields: [authorId], references: [id])
+  reactions    Reaction[]
+  attachments  Attachment[]
+
+  @@index([channelId, createdAt])
+  @@index([conversationId, createdAt])
+  @@index([parentId, createdAt])
+  @@index([authorId])
+}
+
+model Reaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+}
+
+model Attachment {
+  id           String   @id @default(cuid())
+  uploaderId   String
+  messageId    String?
+  fileName     String
+  mimeType     String
+  size         Int
+  storagePath  String
+  createdAt    DateTime @default(now())
+
+  uploader User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  message  Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  @@index([messageId])
+}
+
+// --- Notifications ---
+
+model Notification {
+  id             String           @id @default(cuid())
+  userId         String
+  type           NotificationType
+  title          String
+  body           String
+  read           Boolean          @default(false)
+  workspaceId    String?
+  channelId      String?
+  conversationId String?
+  messageId      String?
+  createdAt      DateTime         @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, read])
+}

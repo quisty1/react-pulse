@@ -1,0 +1,73 @@
+# Полный стек Pulse: Postgres + API + Web
+services:
+  # Основная БД для production-подобного локального запуска
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pulse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pulse}
+      POSTGRES_DB: ${POSTGRES_DB:-pulse}
+    ports:
+      - '5432:5432'
+    volumes:
+      - pulse_pg:/var/lib/postgresql/data
+    # API стартует только после готовности Postgres
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-pulse} -d ${POSTGRES_DB:-pulse}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Express + Socket.IO бэкенд
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse}@postgres:5432/${POSTGRES_DB:-pulse}?schema=public
+      API_PORT: 3001
+      API_HOST: 0.0.0.0
+      # Web в compose слушает 8080
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-change-me-access-secret-min-32-chars!!}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change-me-refresh-secret-min-32-chars!}
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - '3001:3001'
+    volumes:
+      - pulse_uploads:/app/uploads
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Статика React через nginx
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      # URL бэкенда запекаются в бандл на этапе сборки
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+        VITE_SOCKET_URL: ${VITE_SOCKET_URL:-http://localhost:3001}
+        VITE_APP_NAME: Pulse
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - '8080:80'
+
+volumes:
+  pulse_pg:
+  pulse_uploads:
