@@ -39,6 +39,7 @@ export default {
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar))',
           foreground: 'hsl(var(--sidebar-foreground))',
+          active: 'hsl(var(--sidebar-active))',
         },
         pulse: {
           teal: 'hsl(var(--pulse-teal))',
@@ -66,10 +67,20 @@ export default {
           '0%, 100%': { transform: 'scale(1)', opacity: '1' },
           '50%': { transform: 'scale(1.2)', opacity: '0.7' },
         },
+        'ambient-pulse': {
+          '0%, 100%': { opacity: '0.35', transform: 'scale(1)' },
+          '50%': { opacity: '0.55', transform: 'scale(1.05)' },
+        },
+        'slide-in-right': {
+          from: { opacity: '0', transform: 'translateX(12px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.25s ease-out',
         'pulse-dot': 'pulse-dot 1.6s ease-in-out infinite',
+        'ambient-pulse': 'ambient-pulse 4s ease-in-out infinite',
+        'slide-in-right': 'slide-in-right 0.22s ease-out',
       },
     },
   },

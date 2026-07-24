@@ -18,6 +18,7 @@ export {
   DropdownMenuTrigger,
 } from './dropdown-menu';
 export { EmptyState } from './empty-state';
+export { ConfirmDialog } from './confirm-dialog';
 export { ErrorState } from './error-state';
 export { Skeleton } from './skeleton';
 export { ErrorBoundary } from './error-boundary';

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/shared/api/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input } from '@/shared/ui';
 
@@ -19,6 +20,7 @@ interface SearchHit {
 }
 
 export function SearchDialog({ open, onOpenChange, workspaceId }: SearchDialogProps) {
+  const { t } = useTranslation();
   const [q, setQ] = useState('');
   const [hits, setHits] = useState<SearchHit[]>([]);
   const navigate = useNavigate();
@@ -49,7 +51,7 @@ export function SearchDialog({ open, onOpenChange, workspaceId }: SearchDialogPr
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Search messages</DialogTitle>
+          <DialogTitle>{t('search.title')}</DialogTitle>
         </DialogHeader>
         <Input
           value={q}
@@ -57,7 +59,7 @@ export function SearchDialog({ open, onOpenChange, workspaceId }: SearchDialogPr
             setQ(e.target.value);
             if (e.target.value.trim().length < 2) setHits([]);
           }}
-          placeholder="Search by text…"
+          placeholder={t('search.placeholder')}
           autoFocus
         />
         <ul className="max-h-80 space-y-2 overflow-y-auto">
@@ -65,7 +67,7 @@ export function SearchDialog({ open, onOpenChange, workspaceId }: SearchDialogPr
             <li key={hit.id}>
               <button
                 type="button"
-                className="w-full rounded-md border px-3 py-2 text-left hover:bg-muted"
+                className="w-full rounded-md border px-3 py-2 text-left transition-colors hover:bg-muted"
                 onClick={() => {
                   if (hit.channelId) {
                     navigate(`/app/${workspaceId}/channels/${hit.channelId}#message-${hit.id}`);

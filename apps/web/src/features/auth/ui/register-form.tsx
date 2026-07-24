@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { registerSchema, type RegisterInput } from '@pulse/shared';
 import { Button, Input, Label } from '@/shared/ui';
@@ -62,12 +62,6 @@ export function RegisterForm() {
       <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
         {registerMutation.isPending ? t('auth.creating') : t('auth.createAccount')}
       </Button>
-      <p className="text-center text-sm text-muted-foreground">
-        {t('auth.hasAccount')}{' '}
-        <Link className="text-primary underline-offset-4 hover:underline" to="/login">
-          {t('auth.signIn')}
-        </Link>
-      </p>
     </form>
   );
 }

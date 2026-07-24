@@ -12,6 +12,7 @@ import {
   AvatarFallback,
   AvatarImage,
   Button,
+  ConfirmDialog,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -38,6 +39,7 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(message.body);
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const isMine = user?.id === message.author.id;
   const draftBody = editing ? draft : message.body;
 
@@ -56,15 +58,22 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
     <article
       id={`message-${message.id}`}
       className={cn(
-        'group relative grid grid-cols-[40px_1fr] gap-3 rounded-lg px-3 py-2 hover:bg-muted/50',
+        'group relative grid grid-cols-[40px_1fr] gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-muted/40',
         message.id.startsWith('optimistic-') && 'opacity-70',
       )}
     >
       {showHeader ? (
-        <Avatar>
-          {message.author.avatarUrl ? <AvatarImage src={message.author.avatarUrl} alt="" /> : null}
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
+        <div className="relative">
+          <Avatar>
+            {message.author.avatarUrl ? (
+              <AvatarImage src={message.author.avatarUrl} alt="" />
+            ) : null}
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+          {isMine ? (
+            <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-pulse-teal" />
+          ) : null}
+        </div>
       ) : (
         <div />
       )}
@@ -76,7 +85,7 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
               {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
             </time>
             {message.editedAt ? (
-              <span className="text-xs text-muted-foreground">(edited)</span>
+              <span className="text-xs text-muted-foreground">{t('chat.edited')}</span>
             ) : null}
           </header>
         ) : null}
@@ -84,7 +93,7 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
         {editing ? (
           <div className="space-y-2">
             <textarea
-              className="w-full rounded-md border bg-background p-2 text-sm"
+              className="w-full rounded-md border bg-background p-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               value={draftBody}
               onChange={(e) => setDraft(e.target.value)}
               rows={3}
@@ -112,7 +121,7 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
             </div>
           </div>
         ) : (
-          <div className="prose prose-sm dark:prose-invert max-w-none break-words">
+          <div className="prose-pulse max-w-none break-words">
             <Markdown rehypePlugins={[rehypeSanitize]}>{message.body}</Markdown>
           </div>
         )}
@@ -139,8 +148,10 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
                 key={reaction.emoji}
                 type="button"
                 className={cn(
-                  'rounded-full border px-2 py-0.5 text-xs',
-                  reaction.me ? 'border-primary bg-primary/10' : 'border-border bg-background',
+                  'rounded-full border px-2 py-0.5 text-xs transition-colors',
+                  reaction.me
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border bg-background hover:bg-muted',
                 )}
                 onClick={() =>
                   toggleReaction.mutate({ messageId: message.id, emoji: reaction.emoji })
@@ -155,7 +166,7 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
         {message.replyCount > 0 && !message.parentId ? (
           <button
             type="button"
-            className="mt-2 text-sm font-medium text-primary"
+            className="mt-2 text-sm font-medium text-primary transition-opacity hover:opacity-80"
             onClick={() => setThreadMessageId(message.id)}
           >
             {message.replyCount} {t('chat.thread').toLowerCase()}
@@ -164,18 +175,19 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
         ) : null}
       </div>
 
-      <div className="absolute right-2 top-2 hidden gap-1 group-hover:flex">
+      <div className="absolute right-2 top-2 flex gap-1 rounded-md border bg-card/95 p-0.5 opacity-0 shadow-sm backdrop-blur transition-opacity group-hover:opacity-100 focus-within:opacity-100">
         <div className="relative">
           <Button
             size="icon"
             variant="ghost"
-            aria-label="Add reaction"
+            className="h-8 w-8"
+            aria-label={t('chat.addReaction')}
             onClick={() => setEmojiOpen((v) => !v)}
           >
             <Smile className="h-4 w-4" />
           </Button>
           {emojiOpen ? (
-            <div className="absolute right-0 z-20 mt-1">
+            <div className="absolute right-0 z-20 mt-1 animate-fade-in">
               <Suspense fallback={null}>
                 <EmojiPicker
                   onEmojiClick={(emoji) => {
@@ -191,7 +203,12 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost" aria-label="Message actions">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8"
+              aria-label={t('chat.messageActions')}
+            >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -219,19 +236,23 @@ export function MessageItem({ message, showHeader = true }: MessageItemProps) {
               </DropdownMenuItem>
             ) : null}
             {isMine ? (
-              <DropdownMenuItem
-                onClick={() => {
-                  if (window.confirm('Delete this message?')) {
-                    deleteMessage.mutate(message.id);
-                  }
-                }}
-              >
+              <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
                 {t('chat.delete')}
               </DropdownMenuItem>
             ) : null}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title={t('chat.deleteConfirmTitle')}
+        description={t('chat.deleteConfirmDescription')}
+        confirmLabel={t('chat.delete')}
+        destructive
+        onConfirm={() => deleteMessage.mutate(message.id)}
+      />
     </article>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useTranslation } from 'react-i18next';
+import { MessageCircle } from 'lucide-react';
 import { useMessages } from '@/entities/message';
 import { MessageItem } from '@/entities/message/ui/message-item';
 import { MessageComposer } from '@/features/send-message';
@@ -68,7 +69,7 @@ export function MessageArea({ channelId, conversationId, title, subtitle }: Mess
 
   return (
     <section className="flex min-h-0 flex-1 flex-col" aria-label={title}>
-      <header className="flex items-start justify-between border-b px-4 py-3">
+      <header className="flex items-start justify-between border-b bg-background/60 px-4 py-3 backdrop-blur">
         <div>
           <h1 className="font-display text-lg font-semibold">{title}</h1>
           {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
@@ -76,17 +77,21 @@ export function MessageArea({ channelId, conversationId, title, subtitle }: Mess
         {query.hasNextPage ? (
           <button
             type="button"
-            className="text-sm text-primary"
+            className="text-sm text-primary transition-opacity hover:opacity-80"
             onClick={() => void query.fetchNextPage()}
           >
-            Load older
+            {t('chat.loadOlder')}
           </button>
         ) : null}
       </header>
 
       <div ref={parentRef} className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
         {messages.length === 0 ? (
-          <EmptyState title={t('chat.emptyTitle')} description={t('chat.emptyDescription')} />
+          <EmptyState
+            icon={MessageCircle}
+            title={t('chat.emptyTitle')}
+            description={t('chat.emptyDescription')}
+          />
         ) : (
           <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
             {virtualizer.getVirtualItems().map((item) => {

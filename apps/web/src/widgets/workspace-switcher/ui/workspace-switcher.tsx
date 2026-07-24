@@ -37,7 +37,7 @@ export function WorkspaceSwitcher() {
           to={`/app/${ws.id}`}
           title={ws.name}
           className={cn(
-            'rounded-xl ring-offset-background transition',
+            'rounded-xl ring-offset-background transition-transform hover:scale-105',
             workspaceId === ws.id && 'ring-2 ring-primary',
           )}
         >
@@ -74,7 +74,7 @@ export function WorkspaceSwitcher() {
             }}
           >
             <div className="space-y-2">
-              <Label htmlFor="ws-name">Name</Label>
+              <Label htmlFor="ws-name">{t('common.name')}</Label>
               <Input
                 id="ws-name"
                 value={name}

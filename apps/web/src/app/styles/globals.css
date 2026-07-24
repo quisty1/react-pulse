@@ -28,6 +28,7 @@
   --ring: 168 72% 36%;
   --sidebar: 168 28% 12%;
   --sidebar-foreground: 160 20% 96%;
+  --sidebar-active: 168 24% 18%;
   --pulse-teal: 174 70% 42%;
   --pulse-charcoal: 168 28% 12%;
   --radius: 0.75rem;
@@ -53,6 +54,7 @@
   --ring: 174 70% 45%;
   --sidebar: 168 30% 7%;
   --sidebar-foreground: 160 20% 96%;
+  --sidebar-active: 168 22% 14%;
   --pulse-teal: 174 70% 45%;
   --pulse-charcoal: 168 30% 7%;
 }
@@ -91,4 +93,43 @@
 
 .skip-link {
   @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground;
+}
+
+/* Markdown в сообщениях без @tailwindcss/typography */
+@layer components {
+  .prose-pulse {
+    @apply text-sm leading-relaxed text-foreground;
+  }
+
+  .prose-pulse p {
+    @apply my-1;
+  }
+
+  .prose-pulse a {
+    @apply text-primary underline-offset-2 hover:underline;
+  }
+
+  .prose-pulse strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .prose-pulse code {
+    @apply rounded bg-muted px-1 py-0.5 text-[0.85em];
+  }
+
+  .prose-pulse pre {
+    @apply my-2 overflow-x-auto rounded-md bg-muted p-3 text-xs;
+  }
+
+  .prose-pulse ul {
+    @apply my-1 list-disc pl-5;
+  }
+
+  .prose-pulse ol {
+    @apply my-1 list-decimal pl-5;
+  }
+
+  .prose-pulse blockquote {
+    @apply my-2 border-l-2 border-primary/40 pl-3 text-muted-foreground;
+  }
 }

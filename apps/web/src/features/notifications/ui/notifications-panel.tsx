@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Bell } from 'lucide-react';
 import type { NotificationDto } from '@pulse/shared';
 import { api } from '@/shared/api';
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, EmptyState } from '@/shared/ui';
 
 interface NotificationsPanelProps {
   open: boolean;
@@ -9,6 +11,7 @@ interface NotificationsPanelProps {
 }
 
 export function NotificationsPanel({ open, onOpenChange }: NotificationsPanelProps) {
+  const { t } = useTranslation();
   const [items, setItems] = useState<NotificationDto[]>([]);
 
   useEffect(() => {
@@ -22,7 +25,7 @@ export function NotificationsPanel({ open, onOpenChange }: NotificationsPanelPro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Notifications</DialogTitle>
+          <DialogTitle>{t('notifications.title')}</DialogTitle>
         </DialogHeader>
         <div className="flex justify-end">
           <Button
@@ -33,20 +36,24 @@ export function NotificationsPanel({ open, onOpenChange }: NotificationsPanelPro
               setItems((prev) => prev.map((n) => ({ ...n, read: true })));
             }}
           >
-            Mark all read
+            {t('notifications.markAllRead')}
           </Button>
         </div>
-        <ul className="max-h-96 space-y-2 overflow-y-auto">
-          {items.map((item) => (
-            <li
-              key={item.id}
-              className={`rounded-md border px-3 py-2 text-sm ${item.read ? 'opacity-60' : ''}`}
-            >
-              <div className="font-medium">{item.title}</div>
-              <div className="text-muted-foreground">{item.body}</div>
-            </li>
-          ))}
-        </ul>
+        {items.length === 0 ? (
+          <EmptyState icon={Bell} title={t('notifications.empty')} className="py-10" />
+        ) : (
+          <ul className="max-h-96 space-y-2 overflow-y-auto">
+            {items.map((item) => (
+              <li
+                key={item.id}
+                className={`rounded-md border px-3 py-2 text-sm transition-opacity ${item.read ? 'opacity-60' : ''}`}
+              >
+                <div className="font-medium">{item.title}</div>
+                <div className="text-muted-foreground">{item.body}</div>
+              </li>
+            ))}
+          </ul>
+        )}
       </DialogContent>
     </Dialog>
   );

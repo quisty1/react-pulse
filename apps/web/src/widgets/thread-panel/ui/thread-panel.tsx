@@ -4,7 +4,7 @@ import { MessageComposer } from '@/features/send-message';
 import { Button, EmptyState, Skeleton } from '@/shared/ui';
 import { useUiStore } from '@/shared/lib/ui-store';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
+import { MessageCircle, X } from 'lucide-react';
 
 interface ThreadPanelProps {
   channelId?: string;
@@ -20,7 +20,7 @@ export function ThreadPanel({ channelId, conversationId, parentId }: ThreadPanel
 
   return (
     <aside
-      className="flex h-full w-full max-w-md flex-col border-l bg-card"
+      className="flex h-full w-full max-w-md animate-slide-in-right flex-col border-l bg-card"
       aria-label={t('chat.thread')}
     >
       <header className="flex items-center justify-between border-b px-4 py-3">
@@ -28,7 +28,7 @@ export function ThreadPanel({ channelId, conversationId, parentId }: ThreadPanel
         <Button
           size="icon"
           variant="ghost"
-          aria-label="Close thread"
+          aria-label={t('chat.closeThread')}
           onClick={() => setThreadMessageId(null)}
         >
           <X className="h-4 w-4" />
@@ -37,7 +37,7 @@ export function ThreadPanel({ channelId, conversationId, parentId }: ThreadPanel
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
         {query.isLoading ? <Skeleton className="h-20 w-full" /> : null}
         {!query.isLoading && messages.length === 0 ? (
-          <EmptyState title={t('chat.emptyTitle')} />
+          <EmptyState icon={MessageCircle} title={t('chat.emptyTitle')} />
         ) : (
           messages.map((message) => <MessageItem key={message.id} message={message} />)
         )}

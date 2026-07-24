@@ -68,7 +68,7 @@ export function ChannelList() {
                   setChannelOpen(false);
                 }}
               >
-                <Label htmlFor="channel-name">Name</Label>
+                <Label htmlFor="channel-name">{t('common.name')}</Label>
                 <Input
                   id="channel-name"
                   value={channelName}
@@ -87,8 +87,9 @@ export function ChannelList() {
                 to={`/app/${workspaceId}/channels/${channel.id}`}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 hover:bg-white/10 hover:text-sidebar-foreground',
-                    isActive && 'bg-white/10 text-sidebar-foreground',
+                    'relative flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-white/10 hover:text-sidebar-foreground',
+                    isActive &&
+                      'bg-sidebar-active font-medium text-sidebar-foreground before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-pulse-teal',
                   )
                 }
               >
@@ -112,16 +113,16 @@ export function ChannelList() {
           </h2>
           <Dialog open={dmOpen} onOpenChange={setDmOpen}>
             <DialogTrigger asChild>
-              <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Start DM">
+              <Button size="icon" variant="ghost" className="h-7 w-7" aria-label={t('nav.startDm')}>
                 <Plus className="h-3.5 w-3.5" />
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Start a conversation</DialogTitle>
+                <DialogTitle>{t('nav.startConversation')}</DialogTitle>
               </DialogHeader>
               <Input
-                placeholder="Search people"
+                placeholder={t('nav.searchPeople')}
                 value={userQuery}
                 onChange={async (e) => {
                   const q = e.target.value;
@@ -172,8 +173,9 @@ export function ChannelList() {
                   to={`/app/${workspaceId}/dms/${conversation.id}`}
                   className={({ isActive }) =>
                     cn(
-                      'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 hover:bg-white/10',
-                      isActive && 'bg-white/10 text-sidebar-foreground',
+                      'relative flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-white/10 hover:text-sidebar-foreground',
+                      isActive &&
+                        'bg-sidebar-active font-medium text-sidebar-foreground before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-pulse-teal',
                     )
                   }
                 >

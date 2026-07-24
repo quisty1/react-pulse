@@ -78,12 +78,17 @@ export function MessageComposer({
     <div
       {...getRootProps()}
       className={cn(
-        'border-t bg-card/80 p-3 backdrop-blur',
-        isDragActive && 'ring-2 ring-primary ring-inset',
+        'border-t bg-card/80 p-3 backdrop-blur transition-shadow',
+        isDragActive && 'bg-primary/5 ring-2 ring-inset ring-primary',
       )}
     >
       <input {...getInputProps()} />
-      <div className="rounded-xl border bg-background p-2 shadow-sm">
+      <div
+        className={cn(
+          'rounded-xl border bg-background p-2 shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-ring/60',
+          isDragActive && 'border-primary',
+        )}
+      >
         <label htmlFor="composer" className="sr-only">
           {t('chat.messagePlaceholder', { name: targetName })}
         </label>
@@ -107,7 +112,7 @@ export function MessageComposer({
               type="button"
               size="icon"
               variant="ghost"
-              aria-label="Attach file"
+              aria-label={t('chat.attachFile')}
               onClick={open}
             >
               <Paperclip className="h-4 w-4" />
@@ -117,13 +122,13 @@ export function MessageComposer({
                 type="button"
                 size="icon"
                 variant="ghost"
-                aria-label="Insert emoji"
+                aria-label={t('chat.insertEmoji')}
                 onClick={() => setEmojiOpen((v) => !v)}
               >
                 <Smile className="h-4 w-4" />
               </Button>
               {emojiOpen ? (
-                <div className="absolute bottom-10 left-0 z-20">
+                <div className="absolute bottom-10 left-0 z-20 animate-fade-in">
                   <Suspense fallback={null}>
                     <EmojiPicker
                       onEmojiClick={(emoji) => {
@@ -138,12 +143,20 @@ export function MessageComposer({
               ) : null}
             </div>
             {attachmentIds.length > 0 ? (
-              <span className="text-xs text-muted-foreground">{attachmentIds.length} file(s)</span>
+              <span className="text-xs text-muted-foreground">
+                {t('chat.filesCount', { count: attachmentIds.length })}
+              </span>
             ) : null}
           </div>
-          <Button type="button" size="sm" onClick={() => void submit()} disabled={send.isPending}>
+          <Button
+            type="button"
+            size="icon"
+            className="h-9 w-9"
+            onClick={() => void submit()}
+            disabled={send.isPending}
+            aria-label={t('chat.send')}
+          >
             <Send className="h-4 w-4" />
-            Send
           </Button>
         </div>
       </div>

@@ -1,11 +1,14 @@
-import { Menu, Bell, Search, Settings as SettingsIcon, LogOut } from 'lucide-react';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Menu, Bell, Search, Settings as SettingsIcon, LogOut, X, Sun, Moon } from 'lucide-react';
+import { Link, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'next-themes';
 import { WorkspaceSwitcher } from '@/widgets/workspace-switcher';
 import { ChannelList } from '@/widgets/channel-list';
 import { ThreadPanel } from '@/widgets/thread-panel';
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +19,7 @@ import { useLogout, useAuthStore } from '@/features/auth';
 import { useUiStore } from '@/shared/lib/ui-store';
 import { useSocket } from '@/shared/lib/socket';
 import { joinWorkspaceRoom } from '@/shared/lib/socket';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CommandPalette } from '@/features/command-palette';
 import { SearchDialog } from '@/features/search';
 import { NotificationsPanel } from '@/features/notifications';
@@ -32,12 +35,23 @@ export function AppShell() {
   const setSidebarOpen = useUiStore((s) => s.setSidebarOpen);
   const threadMessageId = useUiStore((s) => s.threadMessageId);
   const setLocale = useUiStore((s) => s.setLocale);
-  const { setTheme, theme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [commandOpen, setCommandOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
   useSocket();
+
+  const initials = useMemo(
+    () =>
+      (user?.displayName ?? '?')
+        .split(' ')
+        .map((p) => p[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase(),
+    [user?.displayName],
+  );
 
   useEffect(() => {
     if (workspaceId) joinWorkspaceRoom(workspaceId);
@@ -62,44 +76,53 @@ export function AppShell() {
 
       <aside className="hidden w-[72px] shrink-0 bg-sidebar md:flex md:flex-col">
         <div className="flex items-center justify-center py-4">
-          <img src="/favicon.svg" alt="" className="h-8 w-8" />
+          <Link to="/" className="group relative inline-flex" aria-label={t('app.name')}>
+            <img
+              src="/favicon.svg"
+              alt=""
+              className="h-8 w-8 transition-transform group-hover:scale-105"
+            />
+            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-pulse-teal animate-pulse-dot" />
+          </Link>
         </div>
         <WorkspaceSwitcher />
       </aside>
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 w-72 bg-sidebar transition-transform md:static md:translate-x-0',
+          'fixed inset-y-0 left-0 z-40 w-72 bg-sidebar transition-transform duration-200 md:static md:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         <div className="flex h-14 items-center justify-between border-b border-white/10 px-3 md:hidden">
-          <span className="font-display font-semibold text-sidebar-foreground">Pulse</span>
+          <span className="font-display font-semibold text-sidebar-foreground">
+            {t('app.name')}
+          </span>
           <Button
             size="icon"
             variant="ghost"
-            className="text-sidebar-foreground"
+            className="text-sidebar-foreground hover:bg-white/10"
             onClick={() => setSidebarOpen(false)}
-            aria-label="Close menu"
+            aria-label={t('nav.closeMenu')}
           >
-            ✕
+            <X className="h-4 w-4" />
           </Button>
         </div>
         <ChannelList />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center gap-2 border-b px-3">
+        <header className="flex h-14 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur">
           <Button
             size="icon"
             variant="ghost"
             className="md:hidden"
-            aria-label="Open menu"
+            aria-label={t('nav.openMenu')}
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <div className="font-display text-sm font-semibold md:hidden">Pulse</div>
+          <div className="font-display text-sm font-semibold md:hidden">{t('app.name')}</div>
           <div className="ml-auto flex items-center gap-1">
             <Button
               size="icon"
@@ -119,25 +142,43 @@ export function AppShell() {
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost" aria-label={t('nav.settings')}>
-                  <SettingsIcon className="h-4 w-4" />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label={t('nav.settings')}
+                  className="relative"
+                >
+                  <Avatar className="h-7 w-7">
+                    {user?.avatarUrl ? <AvatarImage src={user.avatarUrl} alt="" /> : null}
+                    <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
+                  </Avatar>
+                  <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full border border-background bg-pulse-teal" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-                  {t('common.theme')}: {theme}
+                <DropdownMenuItem
+                  onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                >
+                  {resolvedTheme === 'dark' ? (
+                    <Sun className="mr-2 h-4 w-4" />
+                  ) : (
+                    <Moon className="mr-2 h-4 w-4" />
+                  )}
+                  {t('common.theme')}:{' '}
+                  {resolvedTheme === 'dark' ? t('common.dark') : t('common.light')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
                     const next = i18n.language === 'en' ? 'ru' : 'en';
                     void i18n.changeLanguage(next);
-                    setLocale(next);
+                    setLocale(next as 'en' | 'ru');
                   }}
                 >
-                  {t('common.language')}: {i18n.language}
+                  {t('common.language')}: {i18n.language === 'ru' ? 'RU' : 'EN'}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/app/settings')}>
-                  Profile
+                  <SettingsIcon className="mr-2 h-4 w-4" />
+                  {t('nav.profile')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={async () => {
@@ -146,7 +187,8 @@ export function AppShell() {
                   }}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  {t('nav.logout')} ({user?.displayName})
+                  {t('nav.logout')}
+                  {user?.displayName ? ` (${user.displayName})` : ''}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
