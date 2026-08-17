@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** Поиск сообщений: текст + опциональные фильтры и cursor */
+/** Message search: text plus optional filters and cursor */
 
 export const searchMessagesSchema = z.object({
   q: z.string().trim().min(1).max(200),

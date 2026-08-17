@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
 
-/** Ищет .env вверх по дереву каталогов (до 6 уровней) */
+/** Walks up the directory tree looking for .env (up to 6 levels) */
 function findEnvFile(startDir: string) {
   let current = startDir;
   for (let i = 0; i < 6; i += 1) {
@@ -16,7 +16,7 @@ function findEnvFile(startDir: string) {
   return null;
 }
 
-/** Загружает .env из корня монорепо до Zod/Prisma-валидации */
+/** Loads .env from the monorepo root before Zod/Prisma validation */
 export function loadDotenv() {
   const fromMeta = fileURLToPath(import.meta.url);
   const envPath =
@@ -25,7 +25,7 @@ export function loadDotenv() {
     findEnvFile(resolve(dirname(fromMeta), '../../..'));
 
   if (envPath) {
-    // Не перезаписываем уже заданные process.env (override: false)
+    // Do not overwrite existing process.env (override: false)
     config({ path: envPath, override: false });
   }
 }

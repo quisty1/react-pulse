@@ -1,4 +1,4 @@
-# Только PostgreSQL для локальной разработки API/web вне Docker
+# PostgreSQL only, for local API/web development outside Docker
 services:
   postgres:
     image: postgres:16-alpine
@@ -10,7 +10,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      # Отдельный volume, чтобы не пересекаться с полным compose
+      # Separate volume so it does not collide with the full compose stack
       - pulse_pg_dev:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-pulse} -d ${POSTGRES_DB:-pulse}']

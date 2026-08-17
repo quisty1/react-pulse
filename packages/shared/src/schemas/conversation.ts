@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** Создание DM/группы: 1–8 участников, name только для GROUP */
+/** Create DM/group: 1–8 members; name only for GROUP */
 
 export const createConversationSchema = z.object({
   memberIds: z.array(z.string().cuid()).min(1).max(8),

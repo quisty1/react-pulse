@@ -1,11 +1,11 @@
 /** @type {import('tailwindcss').Config} */
-// Тема через CSS-переменные (globals.css) + фирменные токены Pulse
+// Theme via CSS variables (globals.css) plus Pulse brand tokens
 export default {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      // Цвета из hsl(var(--*)) для светлой/тёмной темы
+      // Colors from hsl(var(--*)) for light/dark theme
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

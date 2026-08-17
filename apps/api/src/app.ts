@@ -19,11 +19,11 @@ import { createSearchRouter } from './modules/search/search.routes.js';
 import { createUsersRouter } from './modules/users/users.routes.js';
 import { createWorkspacesRouter } from './modules/workspaces/workspaces.routes.js';
 
-/** Собирает Express-приложение: middleware, роуты, swagger, error handler */
+/** Builds the Express app: middleware, routes, swagger, error handler */
 export function createApp(env: Env, logger: Logger, io: SocketServer) {
   const app = express();
 
-  // Нужно за reverse-proxy для корректных IP в rate limit
+  // Required behind a reverse proxy for correct IPs in rate limiting
   app.set('trust proxy', 1);
   app.use(helmet());
   app.use(
@@ -35,7 +35,7 @@ export function createApp(env: Env, logger: Logger, io: SocketServer) {
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
 
-  // Общий лимит запросов
+  // Global request limit
   app.use(
     rateLimit({
       windowMs: env.RATE_LIMIT_WINDOW_MS,
@@ -45,7 +45,7 @@ export function createApp(env: Env, logger: Logger, io: SocketServer) {
     }),
   );
 
-  // Более жёсткий лимит на auth-эндпоинты
+  // Stricter limit on auth endpoints
   const authLimiter = rateLimit({
     windowMs: env.RATE_LIMIT_WINDOW_MS,
     max: env.AUTH_RATE_LIMIT_MAX,
@@ -63,7 +63,7 @@ export function createApp(env: Env, logger: Logger, io: SocketServer) {
   app.use('/api/workspaces', createWorkspacesRouter(env));
   app.use('/api', createChannelsRouter(env));
   app.use('/api', createConversationsRouter(env));
-  // io нужен для realtime-событий при создании сообщений
+  // io is needed for realtime events when creating messages
   app.use('/api', createMessagesRouter(env, io));
   app.use('/api', createFilesRouter(env));
   app.use('/api', createNotificationsRouter(env));

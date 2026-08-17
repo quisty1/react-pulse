@@ -2,22 +2,22 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// Конфиг Vite для SPA: алиасы FSD, корневой .env, proxy на API
+// Vite config for the SPA: FSD aliases, root .env, API proxy
 export default defineConfig({
   plugins: [react()],
-  // Читаем VITE_* из корня монорепо, а не из apps/web
+  // Read VITE_* from the monorepo root, not apps/web
   envDir: path.resolve(__dirname, '../..'),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      // Source shared напрямую в dev, без предварительной сборки пакета
+      // Use shared source in dev, without pre-building the package
       '@pulse/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
     },
   },
   server: {
     port: 5173,
     proxy: {
-      // Прокси /api на бэкенд в dev (без CORS-проблем)
+      // Proxy /api to the backend in dev (avoids CORS issues)
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
@@ -28,7 +28,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        // Разделяем тяжёлые зависимости по чанкам
+        // Split heavy dependencies into chunks
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           query: ['@tanstack/react-query'],

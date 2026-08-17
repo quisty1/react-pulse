@@ -1,18 +1,18 @@
 import { z } from 'zod';
 
-// Схема переменных окружения API (fail-fast при старте)
+// API env schema (fail-fast on startup)
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   DATABASE_URL: z.string().min(1),
   API_PORT: z.coerce.number().default(3001),
   API_HOST: z.string().default('0.0.0.0'),
-  // Несколько origin через запятую
+  // Multiple origins, comma-separated
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
-  // Строка "true"/"false" из .env → boolean
+  // "true"/"false" string from .env → boolean
   COOKIE_SECURE: z
     .string()
     .optional()
@@ -26,7 +26,7 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
-/** Валидирует process.env через Zod перед стартом API */
+/** Validates process.env with Zod before the API starts */
 export function loadEnv(): Env {
   const parsed = envSchema.safeParse(process.env);
   if (!parsed.success) {

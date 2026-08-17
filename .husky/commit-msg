@@ -1,2 +1,2 @@
-# Проверяем сообщение коммита через commitlint
+# Validate the commit message with commitlint
 pnpm exec commitlint --edit "$1"

@@ -18,7 +18,7 @@ declare global {
 }
 /* eslint-enable @typescript-eslint/no-namespace */
 
-/** Обязательная JWT-аутентификация (Bearer access token) */
+/** Required JWT authentication (Bearer access token) */
 export function authenticate(env: Env) {
   return (req: Request, _res: Response, next: NextFunction) => {
     const header = req.headers.authorization;
@@ -37,7 +37,7 @@ export function authenticate(env: Env) {
   };
 }
 
-/** Опциональный JWT: невалидный токен не блокирует запрос */
+/** Optional JWT: an invalid token does not block the request */
 export function optionalAuthenticate(env: Env) {
   return (req: Request, _res: Response, next: NextFunction) => {
     const header = req.headers.authorization;
@@ -49,7 +49,7 @@ export function optionalAuthenticate(env: Env) {
     try {
       req.user = jwt.verify(token, env.JWT_ACCESS_SECRET) as AuthPayload;
     } catch {
-      // Игнорируем невалидный опциональный токен
+      // Ignore an invalid optional token
     }
     next();
   };

@@ -10,7 +10,7 @@ interface UiState {
   setLocale: (locale: 'en' | 'ru') => void;
 }
 
-/** UI-состояние: сайдбар, открытый тред, локаль (persist в localStorage) */
+/** UI state: sidebar, open thread, locale (persisted to localStorage) */
 export const useUiStore = create<UiState>()(
   persist(
     (set) => ({

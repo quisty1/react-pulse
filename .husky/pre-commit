@@ -1,2 +1,2 @@
-# Перед коммитом прогоняем lint-staged (eslint/prettier по staged-файлам)
+# Run lint-staged before commit (eslint/prettier on staged files)
 pnpm exec lint-staged

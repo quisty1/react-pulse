@@ -1,5 +1,5 @@
-# Шаблон деплоя — по умолчанию не включён в автоматический pipeline
-# Настрой secrets репозитория и запускай вручную через workflow_dispatch
+# Deploy template — not part of the automatic pipeline by default
+# Set repository secrets and run manually via workflow_dispatch
 name: Deploy (template)
 
 on:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # На сервере: pull + пересборка compose
+      # On the server: pull + rebuild compose
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:

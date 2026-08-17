@@ -1,4 +1,4 @@
-# Пакеты монорепо: приложения и общие библиотеки
+# Monorepo packages: apps and shared libraries
 packages:
   - 'apps/*'
   - 'packages/*'

@@ -1,4 +1,4 @@
-/** Роли, типы сущностей, лимиты файлов, socket-события */
+/** Roles, entity types, file limits, socket events */
 
 export const WORKSPACE_ROLES = ['OWNER', 'ADMIN', 'MEMBER'] as const;
 export type WorkspaceRole = (typeof WORKSPACE_ROLES)[number];
@@ -30,7 +30,7 @@ export const ALLOWED_MIME_TYPES = [
   'application/zip',
 ] as const;
 
-/** Имена событий Socket.IO (должны совпадать на client и server) */
+/** Socket.IO event names (must match on client and server) */
 export const SOCKET_EVENTS = {
   CONNECTION: 'connection',
   DISCONNECT: 'disconnect',
@@ -53,7 +53,7 @@ export const SOCKET_EVENTS = {
   ERROR: 'error',
 } as const;
 
-/** Логин из prisma seed для локальной разработки */
+/** Login from prisma seed for local development */
 export const DEMO_CREDENTIALS = {
   email: 'demo@pulse.app',
   password: 'Demo123!',

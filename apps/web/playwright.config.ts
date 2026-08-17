@@ -1,12 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// E2E: в CI — preview на 4173, локально — vite dev на 5173
+// E2E: CI uses preview on 4173; locally vite dev on 5173
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  // В CI один воркер стабильнее для общего preview
+  // A single worker in CI is more stable for the shared preview
   workers: process.env.CI ? 1 : undefined,
   reporter: 'list',
   use: {

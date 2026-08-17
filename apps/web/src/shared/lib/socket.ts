@@ -13,7 +13,7 @@ interface PresenceState {
   setOnline: (userId: string, online: boolean) => void;
 }
 
-/** Presence: кто online по socket-событиям */
+/** Presence: who is online from socket events */
 export const usePresenceStore = create<PresenceState>((set) => ({
   onlineIds: new Set(),
   setOnline: (userId, online) =>
@@ -31,7 +31,7 @@ export function getSocket(): Socket | null {
   return socket;
 }
 
-/** Подключает Socket.IO при наличии accessToken и синхронизирует кэш сообщений */
+/** Connects Socket.IO when accessToken is set and syncs the message cache */
 export function useSocket() {
   const accessToken = useAuthStore((s) => s.accessToken);
   const qc = useQueryClient();
@@ -58,7 +58,7 @@ export function useSocket() {
       connected.current = true;
     });
 
-    // Оптимистичное обновление infinite-query сообщений
+    // Optimistic update of the messages infinite query
     socket.on(SOCKET_EVENTS.MESSAGE_CREATED, (message: MessageDto) => {
       const key = [
         'messages',
@@ -68,7 +68,7 @@ export function useSocket() {
       ] as const;
       qc.setQueryData<InfiniteData<PaginatedResult<MessageDto>>>(key, (old) => {
         if (!old) return old;
-        // Уже есть по id или clientId (оптимистичный insert)
+        // Already present by id or clientId (optimistic insert)
         const exists = old.pages.some((p) =>
           p.items.some(
             (m) => m.id === message.id || (message.clientId && m.clientId === message.clientId),

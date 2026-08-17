@@ -1,7 +1,7 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
-// Flat-config ESLint для Node/Express API
+// Flat-config ESLint for the Node/Express API
 export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,

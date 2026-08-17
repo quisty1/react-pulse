@@ -1,4 +1,4 @@
-// Укороченная OpenAPI-спека для Swagger UI (/api/docs)
+// Shortened OpenAPI spec for Swagger UI (/api/docs)
 export const openApiDocument = {
   openapi: '3.0.3',
   info: {

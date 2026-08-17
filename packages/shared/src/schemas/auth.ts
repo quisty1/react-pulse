@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** Zod-схемы auth: register / login / profile */
+/** Auth Zod schemas: register / login / profile */
 
 export const registerSchema = z.object({
   email: z.string().email().max(255),

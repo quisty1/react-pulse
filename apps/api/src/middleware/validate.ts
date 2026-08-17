@@ -3,7 +3,7 @@ import type { ZodSchema } from 'zod';
 
 type RequestPart = 'body' | 'query' | 'params';
 
-/** Middleware: парсит и подменяет req[part] результатом Zod */
+/** Middleware: parse and replace req[part] with the Zod result */
 export function validate(schema: ZodSchema, part: RequestPart = 'body') {
   return (req: Request, _res: Response, next: NextFunction) => {
     const parsed = schema.parse(req[part]);

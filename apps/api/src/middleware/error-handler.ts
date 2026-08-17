@@ -3,7 +3,7 @@ import { ZodError } from 'zod';
 import type { Logger } from '../config/logger.js';
 import { AppError } from '../lib/errors.js';
 
-/** Централизованный обработчик: Zod → AppError → 500 */
+/** Central handler: Zod → AppError → 500 */
 export function errorHandler(logger: Logger) {
   return (err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     if (err instanceof ZodError) {

@@ -1,4 +1,4 @@
-/** Единый контракт ошибок REST API (web + api) */
+/** Shared REST API error contract (web + api) */
 export type ApiErrorCode =
   | 'VALIDATION_ERROR'
   | 'UNAUTHORIZED'
@@ -25,7 +25,7 @@ export interface ApiSuccessBody<T> {
 
 export type ApiResponse<T> = ApiSuccessBody<T> | ApiErrorBody;
 
-/** Cursor-based пагинация */
+/** Cursor-based pagination */
 export interface PaginatedMeta {
   nextCursor: string | null;
   hasMore: boolean;

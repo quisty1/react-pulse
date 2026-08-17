@@ -59,7 +59,7 @@ model User {
   invitesCreated       Invite[]            @relation("InviteCreator")
 }
 
-// Хеш refresh-токена; при удалении пользователя каскадно чистим
+// Refresh-token hash; cascade-delete when the user is removed
 model RefreshToken {
   id        String   @id @default(cuid())
   tokenHash String   @unique
@@ -102,7 +102,7 @@ model WorkspaceMember {
   @@index([userId])
 }
 
-// Приглашение по токену (опционально с email)
+// Invite by token (optional email)
 model Invite {
   id          String        @id @default(cuid())
   workspaceId String
@@ -192,7 +192,7 @@ model ConversationMember {
 
 // --- Messages ---
 
-// Сообщение в канале или DM; parentId — тред
+// Message in a channel or DM; parentId is the thread
 model Message {
   id             String    @id @default(cuid())
   channelId      String?
@@ -200,7 +200,7 @@ model Message {
   parentId       String?
   authorId       String
   body           String
-  // Идемпотентность отправки с клиента
+  // Client-side send idempotency
   clientId       String?
   mentionedIds   String[]  @default([])
   editedAt       DateTime?

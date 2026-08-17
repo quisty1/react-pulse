@@ -1,4 +1,4 @@
 import { PrismaClient } from '@prisma/client';
 
-// Единый Prisma-клиент на процесс
+// Single Prisma client per process
 export const prisma = new PrismaClient();

@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { WORKSPACE_ROLES } from '../constants.js';
 
-/** Zod-схемы workspace: создание, инвайт, смена роли */
+/** Workspace Zod schemas: create, invite, change role */
 
 export const createWorkspaceSchema = z.object({
   name: z.string().trim().min(2).max(64),
-  // Если slug не передан — генерируется на сервере
+  // If slug is omitted, the server generates one
   slug: z
     .string()
     .trim()
@@ -24,7 +24,7 @@ export const inviteMemberSchema = z.object({
   role: z.enum(WORKSPACE_ROLES).default('MEMBER'),
 });
 
-// OWNER через эту схему не назначают
+// OWNER is not assigned through this schema
 export const updateMemberRoleSchema = z.object({
   role: z.enum(['ADMIN', 'MEMBER']),
 });

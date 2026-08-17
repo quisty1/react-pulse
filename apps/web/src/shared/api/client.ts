@@ -4,7 +4,7 @@ import { useAuthStore } from '@/features/auth';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '';
 
-/** Axios-клиент к /api с cookie и Bearer */
+/** Axios client for /api with cookie and Bearer */
 export const api = axios.create({
   baseURL: `${API_URL}/api`,
   withCredentials: true,
@@ -19,7 +19,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Один refresh на пачку параллельных 401
+// One refresh for a burst of parallel 401s
 let refreshPromise: Promise<string | null> | null = null;
 
 async function refreshAccessToken() {
@@ -48,7 +48,7 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config as (typeof error.config & { _retry?: boolean }) | undefined;
-    // Повтор запроса один раз после успешного refresh
+    // Retry the request once after a successful refresh
     if (error.response?.status === 401 && original && !original._retry) {
       original._retry = true;
       const token = await refreshAccessToken();
@@ -62,7 +62,7 @@ api.interceptors.response.use(
   },
 );
 
-/** Достаёт message из ApiError или AxiosError */
+/** Extracts message from ApiError or AxiosError */
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as { error?: { message?: string } } | undefined;

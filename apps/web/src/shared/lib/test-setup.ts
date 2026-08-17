@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-// In-memory localStorage для jsdom (persist zustand в тестах)
+// In-memory localStorage for jsdom (zustand persist in tests)
 const storage = new Map<string, string>();
 
 Object.defineProperty(globalThis, 'localStorage', {

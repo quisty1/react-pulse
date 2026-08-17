@@ -5,7 +5,7 @@ import type {
   WorkspaceRole,
 } from './constants.js';
 
-/** Публичные DTO, общие для API и web (даты — ISO-строки) */
+/** Public DTOs shared by API and web (dates are ISO strings) */
 
 export interface UserDto {
   id: string;
@@ -82,7 +82,7 @@ export interface MessageDto {
   parentId: string | null;
   author: UserDto;
   body: string;
-  // Для идемпотентности оптимистичных отправок
+  // For idempotency of optimistic sends
   clientId: string | null;
   createdAt: string;
   updatedAt: string;

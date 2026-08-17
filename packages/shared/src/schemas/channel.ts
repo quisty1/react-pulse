@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { CHANNEL_TYPES } from '../constants.js';
 
-/** Zod-схемы channel: имя в lowercase, PUBLIC/PRIVATE */
+/** Channel Zod schemas: lowercase name, PUBLIC/PRIVATE */
 
 export const createChannelSchema = z.object({
   name: z

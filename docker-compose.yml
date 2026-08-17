@@ -1,6 +1,6 @@
-# Полный стек Pulse: Postgres + API + Web
+# Full Pulse stack: Postgres + API + Web
 services:
-  # Основная БД для production-подобного локального запуска
+  # Primary DB for a production-like local run
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -12,14 +12,14 @@ services:
       - '5432:5432'
     volumes:
       - pulse_pg:/var/lib/postgresql/data
-    # API стартует только после готовности Postgres
+    # API starts only after Postgres is ready
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-pulse} -d ${POSTGRES_DB:-pulse}']
       interval: 5s
       timeout: 5s
       retries: 10
 
-  # Express + Socket.IO бэкенд
+  # Express + Socket.IO backend
   api:
     build:
       context: .
@@ -33,7 +33,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse}@postgres:5432/${POSTGRES_DB:-pulse}?schema=public
       API_PORT: 3001
       API_HOST: 0.0.0.0
-      # Web в compose слушает 8080
+      # Web in compose listens on 8080
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-change-me-access-secret-min-32-chars!!}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change-me-refresh-secret-min-32-chars!}
@@ -51,12 +51,12 @@ services:
       timeout: 5s
       retries: 10
 
-  # Статика React через nginx
+  # React static files via nginx
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-      # URL бэкенда запекаются в бандл на этапе сборки
+      # Backend URLs are baked into the bundle at build time
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
         VITE_SOCKET_URL: ${VITE_SOCKET_URL:-http://localhost:3001}

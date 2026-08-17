@@ -1,4 +1,4 @@
-// Демо-данные для локальной разработки (идемпотентно: сначала чистим таблицы)
+// Demo data for local development (idempotent: wipe tables first)
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,7 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import { DEMO_CREDENTIALS } from '@pulse/shared';
 
 const here = dirname(fileURLToPath(import.meta.url));
-// Ищем .env в cwd и вверх по монорепо
+// Look for .env in cwd and up the monorepo
 const envCandidates = [
   resolve(process.cwd(), '.env'),
   resolve(here, '../../../.env'),
@@ -24,7 +24,7 @@ for (const envPath of envCandidates) {
 const prisma = new PrismaClient();
 
 async function main() {
-  // Порядок удаления с учётом FK
+  // Delete in FK-safe order
   await prisma.reaction.deleteMany();
   await prisma.attachment.deleteMany();
   await prisma.notification.deleteMany();
@@ -77,7 +77,7 @@ async function main() {
     },
   });
 
-  // Два воркспейса: Acme (основной демо) и Northstar
+  // Two workspaces: Acme (primary demo) and Northstar
   const acme = await prisma.workspace.create({
     data: {
       name: 'Acme Labs',
@@ -107,7 +107,7 @@ async function main() {
     },
   });
 
-  // Каналы: public general/engineering и private leadership
+  // Channels: public general/engineering and private leadership
   const general = await prisma.channel.create({
     data: {
       workspaceId: acme.id,
@@ -166,7 +166,7 @@ async function main() {
     },
   });
 
-  // Приветственное сообщение с упоминанием и тредом
+  // Welcome message with a mention and a thread
   const parent = await prisma.message.create({
     data: {
       channelId: general.id,
@@ -220,7 +220,7 @@ async function main() {
     },
   });
 
-  // DM и групповой чат для демо UI
+  // DM and group chat for the demo UI
   const dm = await prisma.conversation.create({
     data: {
       workspaceId: acme.id,

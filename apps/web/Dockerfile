@@ -1,9 +1,9 @@
-# Базовый образ с pnpm через corepack
+# Base image with pnpm via corepack
 FROM node:20-alpine AS base
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
-# Сборка Vite-бандла; VITE_* запекаются на этом этапе
+# Vite bundle build; VITE_* are baked in at this stage
 FROM base AS build
 ARG VITE_API_URL=http://localhost:3001
 ARG VITE_SOCKET_URL=http://localhost:3001
@@ -18,7 +18,7 @@ RUN pnpm install --filter @pulse/web... || pnpm install --filter @pulse/web...
 RUN pnpm --filter @pulse/shared build
 RUN pnpm --filter @pulse/web build
 
-# Раздача статики через nginx
+# Serve static files via nginx
 FROM nginx:1.27-alpine AS runner
 RUN adduser -D -H -u 1001 pulse
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf

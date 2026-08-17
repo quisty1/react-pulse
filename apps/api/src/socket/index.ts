@@ -6,10 +6,10 @@ import type { Env } from '../config/env.js';
 import type { Logger } from '../config/logger.js';
 import type { AuthPayload } from '../middleware/auth.js';
 
-// userId → set socket.id (несколько вкладок одного пользователя)
+// userId → set of socket.id (multiple tabs of the same user)
 const onlineUsers = new Map<string, Set<string>>();
 
-/** Socket.IO: JWT на handshake, комнаты workspace/channel/conversation, presence */
+/** Socket.IO: JWT on handshake, workspace/channel/conversation rooms, presence */
 export function createSocketServer(httpServer: HttpServer, env: Env, logger: Logger) {
   const io = new Server(httpServer, {
     cors: {
@@ -18,7 +18,7 @@ export function createSocketServer(httpServer: HttpServer, env: Env, logger: Log
     },
   });
 
-  // Токен из auth.token или Authorization header
+  // Token from auth.token or Authorization header
   io.use((socket, next) => {
     const token =
       (socket.handshake.auth?.token as string | undefined) ??
@@ -108,7 +108,7 @@ export function createSocketServer(httpServer: HttpServer, env: Env, logger: Log
     socket.on(SOCKET_EVENTS.DISCONNECT, () => {
       const set = onlineUsers.get(user.sub);
       set?.delete(socket.id);
-      // Offline только когда закрыты все вкладки пользователя
+      // Offline only when all of the user's tabs are closed
       if (set && set.size === 0) {
         onlineUsers.delete(user.sub);
         io.emit(SOCKET_EVENTS.PRESENCE_UPDATE, { userId: user.sub, status: 'offline' });
@@ -120,7 +120,7 @@ export function createSocketServer(httpServer: HttpServer, env: Env, logger: Log
   return io;
 }
 
-/** Список userId, у которых есть хотя бы одно активное соединение */
+/** userIds that have at least one active connection */
 export function getOnlineUserIds() {
   return [...onlineUsers.keys()];
 }

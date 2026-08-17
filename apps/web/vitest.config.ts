@@ -2,7 +2,7 @@ import path from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 
-// Unit-тесты web: jsdom + те же алиасы, что у Vite
+// Web unit tests: jsdom plus the same aliases as Vite
 export default defineConfig({
   plugins: [react()],
   resolve: {

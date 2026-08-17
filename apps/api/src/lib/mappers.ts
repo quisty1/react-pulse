@@ -1,7 +1,7 @@
 import type { User } from '@prisma/client';
 import type { UserDto } from '@pulse/shared';
 
-/** Prisma User → публичный DTO без passwordHash */
+/** Prisma User → public DTO without passwordHash */
 export function toUserDto(user: User): UserDto {
   return {
     id: user.id,

@@ -1,6 +1,6 @@
 import type { ApiErrorCode } from '@pulse/shared';
 
-/** Доменная ошибка с HTTP-статусом и кодом для клиента */
+/** Domain error with HTTP status and a client-facing code */
 export class AppError extends Error {
   constructor(
     public readonly code: ApiErrorCode,

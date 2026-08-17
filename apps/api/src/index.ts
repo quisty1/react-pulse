@@ -5,7 +5,7 @@ import { createLogger } from './config/logger.js';
 import { createApp } from './app.js';
 import { createSocketServer } from './socket/index.js';
 
-// Сначала .env, затем Zod-валидация и старт HTTP + Socket.IO
+// Load .env first, then Zod validation and HTTP + Socket.IO
 loadDotenv();
 
 const env = loadEnv();
@@ -14,7 +14,7 @@ const httpServer = createServer();
 const io = createSocketServer(httpServer, env, logger);
 const app = createApp(env, logger, io);
 
-// Один server для REST и websocket
+// One server for REST and websocket
 httpServer.on('request', app);
 
 httpServer.listen(env.API_PORT, env.API_HOST, () => {

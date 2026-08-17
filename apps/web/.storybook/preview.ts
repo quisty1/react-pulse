@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/react';
-// Подключаем глобальные стили и CSS-переменные темы
+// Load global styles and theme CSS variables
 import '../src/app/styles/globals.css';
 
 const preview: Preview = {

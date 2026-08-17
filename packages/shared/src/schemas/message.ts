@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-/** Zod-схемы сообщений, реакций и cursor-пагинации */
+/** Message, reaction, and cursor-pagination Zod schemas */
 
 export const createMessageSchema = z.object({
   body: z.string().trim().min(1).max(4000),
   parentId: z.string().cuid().optional(),
-  // UUID с клиента для идемпотентности
+  // Client UUID for idempotency
   clientId: z.string().uuid().optional(),
   mentionedUserIds: z.array(z.string().cuid()).max(20).optional(),
   attachmentIds: z.array(z.string().cuid()).max(10).optional(),
@@ -22,7 +22,7 @@ export const reactionSchema = z.object({
 export const messageCursorSchema = z.object({
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
-  // null — корневой канал/DM, cuid — тред
+  // null — root channel/DM, cuid — thread
   parentId: z.string().cuid().optional().nullable(),
 });
 

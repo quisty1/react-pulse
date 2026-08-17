@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
 
-// Unit-тесты API в Node-окружении
+// API unit tests in a Node environment
 export default defineConfig({
   test: {
     environment: 'node',

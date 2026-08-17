@@ -1,7 +1,7 @@
 import pino from 'pino';
 import type { Env } from './env.js';
 
-/** Pino-логгер: pretty в dev, redact секретов */
+/** Pino logger: pretty in dev, redact secrets */
 export function createLogger(env: Env) {
   return pino({
     level: env.NODE_ENV === 'production' ? 'info' : 'debug',

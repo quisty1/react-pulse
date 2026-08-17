@@ -1,4 +1,4 @@
-// Локальный Postgres без Docker: данные в .data/pg у корня монорепо
+// Local Postgres without Docker: data in .data/pg at the monorepo root
 import { existsSync, mkdirSync, unlinkSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,7 +19,7 @@ const pg = new EmbeddedPostgres({
   password,
   port,
   persistent: true,
-  // UTF-8, чтобы кириллица в сообщениях не ломалась
+  // UTF-8 so Cyrillic in messages is not corrupted
   initdbFlags: ['--encoding=UTF8', '--locale=C'],
   onLog: (message) => {
     process.stdout.write(`[pg] ${message}`);
@@ -33,7 +33,7 @@ async function main() {
   console.log(`Starting embedded PostgreSQL in ${databaseDir} on :${port}`);
   const alreadyInitialised = existsSync(join(databaseDir, 'PG_VERSION'));
   if (alreadyInitialised) {
-    // Убрать stale pid после переноса проекта / жёсткого kill
+    // Remove stale pid after moving the project or a hard kill
     const pidFile = join(databaseDir, 'postmaster.pid');
     if (existsSync(pidFile)) {
       unlinkSync(pidFile);

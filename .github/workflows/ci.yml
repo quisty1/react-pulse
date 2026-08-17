@@ -1,4 +1,4 @@
-# Линт, typecheck, тесты, сборка и smoke e2e на PR/push
+# Lint, typecheck, tests, build, and smoke e2e on PR/push
 name: CI
 
 on:
@@ -6,7 +6,7 @@ on:
     branches: [main, master]
   pull_request:
 
-# Отменяем устаревшие прогоны на той же ветке
+# Cancel stale runs on the same branch
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    # Postgres для unit/integration тестов API
+    # Postgres for API unit/integration tests
     services:
       postgres:
         image: postgres:16-alpine
@@ -72,14 +72,14 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm --filter @pulse/web exec playwright install --with-deps chromium
 
-      # preview поднимается из конфига Playwright (webServer)
+      # preview is started from the Playwright config (webServer)
       - name: Playwright
         run: pnpm --filter @pulse/web exec playwright test --project=chromium
         env:
           CI: 'true'
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
-      # Не блокируем CI, если Dockerfile ещё не готов
+      # Do not fail CI if the Dockerfile is not ready yet
       - name: Docker build api
         if: ${{ hashFiles('apps/api/Dockerfile') != '' }}
         continue-on-error: true

@@ -1,4 +1,4 @@
-// PostCSS: Tailwind + Autoprefixer для Vite-сборки
+// PostCSS: Tailwind + Autoprefixer for the Vite build
 export default {
   plugins: {
     tailwindcss: {},
